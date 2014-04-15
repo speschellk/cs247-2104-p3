@@ -22,7 +22,7 @@
     }else{
       fb_chat_room_id = Math.random().toString(36).substring(7);
     }
-    display_msg({m:"Share this url with your friend to join this chat: "+ document.location.origin+"/#"+fb_chat_room_id,c:"red"})
+    display_msg({m:"Invite others to the Emotobooth: "+ document.location.origin+"/#"+fb_chat_room_id,c:"black"})
 
     // set up variables to access firebase data structure
     var fb_new_chat_room = fb_instance.child('chatrooms').child(fb_chat_room_id);
@@ -39,7 +39,7 @@
     });
 
     // block until username is answered
-    var username = window.prompt("Welcome, warrior! please declare your name?");
+    var username = window.prompt("Welcome! What's your name?");
     if(!username){
       username = "anonymous"+Math.floor(Math.random()*1111);
     }
@@ -68,23 +68,29 @@
     $("#conversation").append("<div class='msg' style='color:"+data.c+"'>"+data.m+"</div>");
     if(data.v){
       // for video element
+      var emotophoto = document.getElementById('emotophoto');
+      emotophoto.innerHTML = "";
+
       var video = document.createElement("video");
       video.autoplay = true;
       video.controls = false; // optional
       video.loop = true;
-      video.width = 120;
+      video.width = 300;
+      video.height = 225;
 
       var source = document.createElement("source");
       source.src =  URL.createObjectURL(base64_to_blob(data.v));
       source.type =  "video/webm";
 
       video.appendChild(source);
-
       // for gif instead, use this code below and change mediaRecorder.mimeType in onMediaSuccess below
       // var video = document.createElement("img");
       // video.src = URL.createObjectURL(base64_to_blob(data.v));
 
-      document.getElementById("conversation").appendChild(video);
+      document.getElementById("emotophoto").appendChild(video);
+
+      // for polaroid caption element
+      $("#emotophoto").append("<div id='caption'>"+data.m+"</div>");
     }
   }
 
@@ -120,12 +126,12 @@
       video.play();
       webcam_stream.appendChild(video);
 
-      // counter
-      var time = 0;
-      var second_counter = document.getElementById('second_counter');
-      var second_counter_update = setInterval(function(){
-        second_counter.innerHTML = time++;
-      },1000);
+      // // counter
+      // var time = 0;
+      // var second_counter = document.getElementById('second_counter');
+      // var second_counter_update = setInterval(function(){
+      //   second_counter.innerHTML = time++;
+      // },1000);
 
       // now record stream in 5 seconds interval
       var video_container = document.getElementById('video_container');
@@ -149,8 +155,8 @@
       };
       setInterval( function() {
         mediaRecorder.stop();
-        mediaRecorder.start(3000);
-      }, 3000 );
+        mediaRecorder.start(2000);
+      }, 2000 );
       console.log("connect to media stream!");
     }
 
@@ -165,7 +171,7 @@
 
   // check to see if a message qualifies to be replaced with video.
   var has_emotions = function(msg){
-    var options = ["lol",":)",":("];
+    var options = ["lol","omg","cheese",":)",":P",";P",":D",";)",";D"];
     for(var i=0;i<options.length;i++){
       if(msg.indexOf(options[i])!= -1){
         return true;
